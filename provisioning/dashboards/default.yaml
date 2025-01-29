@@ -1,0 +1,7 @@
+apiVersion: 1
+
+providers:
+  - name: 'GrafanaTest'
+    type: file
+    options:
+      path: /etc/grafana/provisioning/dashboards
