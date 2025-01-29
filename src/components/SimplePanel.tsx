@@ -90,14 +90,14 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
       textColor: '#FFFFFF',
     };
 
-    if (pod.memoryLimit === undefined) {
-      pod.memoryLimit = 0;
-      pod.memoryPerc = 0;
+    if ('' + pod.memoryLimit === '' || pod.memoryLimit === undefined) {
+      pod.memoryLimit = -1;
+      pod.memoryPerc = -1;
     }
 
-    if (pod.cpuLimit === undefined) {
-      pod.cpuLimit = 0;
-      pod.cpuPerc = 0;
+    if ('' + pod.cpuLimit === '' || pod.cpuLimit === undefined) {
+      pod.cpuLimit = -1;
+      pod.cpuPerc = -1;
     }
 
     if (pod.memoryPerc >= options.memoryErrorLevel || pod.cpuPerc >= options.cpuErrorLevel) {
@@ -147,6 +147,17 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ pod, showPercentage }) => {
+  let memPerc = '' + pod.memoryPerc;
+  let cpuPerc = '' + pod.cpuPerc;
+
+  if (pod.memoryPerc === -1) {
+    memPerc = '??';
+  }
+
+  if (pod.cpuPerc === -1) {
+    cpuPerc = '??';
+  }
+
   return (
     <div
       className="p-2 m-2 rounded-lg w-20 h-20"
@@ -157,15 +168,13 @@ const Card: React.FC<CardProps> = ({ pod, showPercentage }) => {
         <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
           <path d="M176 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40c-35.3 0-64 28.7-64 64l-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0 0 56-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0 0 56-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0c0 35.3 28.7 64 64 64l0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40 56 0 0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40 56 0 0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40c35.3 0 64-28.7 64-64l40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0 0-56 40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0 0-56 40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0c0-35.3-28.7-64-64-64l0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40-56 0 0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40-56 0 0-40zM160 128l192 0c17.7 0 32 14.3 32 32l0 192c0 17.7-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32l0-192c0-17.7 14.3-32 32-32zm192 32l-192 0 0 192 192 0 0-192z" />
         </svg>
-        <div className="ml-2 truncate">{showPercentage ? `${pod.cpuPerc}%` : `${pod.cpu}/${pod.cpuLimit}`}</div>
+        <div className="ml-2 truncate">{showPercentage ? `${cpuPerc}%` : `${pod.cpu}/${pod.cpuLimit}`}</div>
       </div>
       <div className="flex items-center">
         <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
           <path d="M64 64C28.7 64 0 92.7 0 128l0 7.4c0 6.8 4.4 12.6 10.1 16.3C23.3 160.3 32 175.1 32 192s-8.7 31.7-21.9 40.3C4.4 236 0 241.8 0 248.6L0 320l576 0 0-71.4c0-6.8-4.4-12.6-10.1-16.3C552.7 223.7 544 208.9 544 192s8.7-31.7 21.9-40.3c5.7-3.7 10.1-9.5 10.1-16.3l0-7.4c0-35.3-28.7-64-64-64L64 64zM576 352L0 352l0 64c0 17.7 14.3 32 32 32l48 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 96 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 96 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 96 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 48 0c17.7 0 32-14.3 32-32l0-64zM192 160l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32zm128 0l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32zm128 0l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32z" />
         </svg>
-        <div className="ml-2 truncate">
-          {showPercentage ? `${pod.memoryPerc}%` : `${pod.memory}/${pod.memoryLimit}`}
-        </div>
+        <div className="ml-2 truncate">{showPercentage ? `${memPerc}%` : `${pod.memory}/${pod.memoryLimit}`}</div>
       </div>
     </div>
   );
