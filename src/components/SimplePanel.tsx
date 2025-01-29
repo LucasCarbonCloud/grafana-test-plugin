@@ -132,8 +132,8 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
     >
       <div className="flex flex-wrap" style={{ background: '' }}>
         <>
-          {pods.map((pod) => (
-            <Card pod={pod} showPercentage={options.showPercentage} />
+          {pods.map((pod, index) => (
+            <Card key={index} pod={pod} showPercentage={options.showPercentage} />
           ))}
         </>
       </div>
