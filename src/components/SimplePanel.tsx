@@ -59,7 +59,7 @@ function getFieldNumber(name: string, data: DataFrame): number {
 }
 
 export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fieldConfig, id }) => {
-  // const theme = useTheme2();
+  const theme = useTheme2();
   const styles = useStyles2(getStyles);
 
   const colPod = getFieldNumber(options.podNameColumnName, data.series[0]);
@@ -85,27 +85,30 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
       cpuPerc: Math.round(
         (100 * data.series[0].fields[colCpu].values[index]) / data.series[0].fields[colCpuLimit].values[index]
       ),
+      state: 'none',
+      color: '#000000',
+      textColor: '#FFFFFF',
     };
 
-    if (pod.memoryLimit == undefined) {
+    if (pod.memoryLimit === undefined) {
       pod.memoryLimit = 0;
       pod.memoryPerc = 0;
     }
 
-    if (pod.cpuLimit == undefined) {
+    if (pod.cpuLimit === undefined) {
       pod.cpuLimit = 0;
       pod.cpuPerc = 0;
     }
 
     if (pod.memoryPerc >= options.memoryErrorLevel || pod.cpuPerc >= options.cpuErrorLevel) {
       pod.state = 'error';
-      pod.color = useTheme2().visualization.getColorByName(options.errorColor);
+      pod.color = theme.visualization.getColorByName(options.errorColor);
     } else if (pod.memoryPerc >= options.memoryWarningLevel || pod.cpuPerc >= options.cpuWarningLevel) {
       pod.state = 'warn';
-      pod.color = useTheme2().visualization.getColorByName(options.warningColor);
+      pod.color = theme.visualization.getColorByName(options.warningColor);
     } else {
       pod.state = 'ok';
-      pod.color = useTheme2().visualization.getColorByName(options.okColor);
+      pod.color = theme.visualization.getColorByName(options.okColor);
     }
 
     if (colorIsDark(pod.color)) {
@@ -129,7 +132,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
     >
       <div className="flex flex-wrap" style={{ background: '' }}>
         <>
-          {pods.map((pod, index) => (
+          {pods.map((pod) => (
             <Card pod={pod} showPercentage={options.showPercentage} />
           ))}
         </>
