@@ -1,0 +1,41 @@
+[
+  {
+    "columns": [
+      {
+        "text": "Time",
+        "type": "time"
+      },
+      {
+        "text": "app",
+        "type": "string"
+      },
+      {
+        "text": "pod",
+        "type": "string"
+      },
+      {
+        "text": "memory",
+        "type": "number"
+      },
+      {
+        "text": "memory_limit",
+        "type": "number"
+      },
+      {
+        "text": "cpu",
+        "type": "number"
+      },
+      {
+        "text": "cpu_limit",
+        "type": "number"
+      }
+    ],
+    "rows": [
+      [1609459200000, "appA", "alertmanager-kube-prometheus-stack-alertmanager-0", 10, 9, 1000, 1700],
+      [1609462800000, "appB", "logs-collector-zdvg9", 20, 22, 121, 234],
+      [1609466400000, "appA", "ztunnel-7rnd7", 15, 15, 123, 222],
+      [1609470000000, "appC", "argocd-redis-ha-haproxy-7d9d56ffd8-bwx2t", 25, 100, 2311, 45345],
+      [1609473600000, "appA", "carbondata-backend-7955566874-6xfn4", 30, 50, 23423, 123]
+    ]
+  }
+]
