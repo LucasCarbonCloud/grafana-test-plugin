@@ -31,7 +31,7 @@ const getStyles = () => {
 interface Pod {
   name: string;
   cpu: number;
-  cpuLimit: number;
+  cpuRequest: number;
   cpuPerc: number;
   memory: number;
   memoryLimit: number;
@@ -68,7 +68,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
   const colMemory = getFieldNumber(options.memoryColumnName, data.series[0]);
   const colMemoryLimit = getFieldNumber(options.memoryLimitColumnName, data.series[0]);
   const colCpu = getFieldNumber(options.cpuColumnName, data.series[0]);
-  const colCpuLimit = getFieldNumber(options.cpuLimitColumnName, data.series[0]);
+  const colCpuLimit = getFieldNumber(options.cpuRequestColumnName, data.series[0]);
 
   if (data.series.length === 0) {
     return <PanelDataErrorView fieldConfig={fieldConfig} panelId={id} data={data} needsStringField />;
@@ -83,7 +83,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
         (100 * data.series[0].fields[colMemory].values[index]) / data.series[0].fields[colMemoryLimit].values[index]
       ),
       cpu: data.series[0].fields[colCpu].values[index],
-      cpuLimit: data.series[0].fields[colCpuLimit].values[index], // Add memoryLimit if needed
+      cpuRequest: data.series[0].fields[colCpuLimit].values[index], // Add memoryLimit if needed
       cpuPerc: Math.round(
         (100 * data.series[0].fields[colCpu].values[index]) / data.series[0].fields[colCpuLimit].values[index]
       ),
@@ -98,7 +98,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
       pod.memoryUnknown = true;
     }
 
-    if (!pod.cpuLimit) {
+    if (!pod.cpuRequest) {
       pod.cpuUnknown = true;
     }
 
@@ -157,7 +157,15 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
       <div className="flex flex-wrap" style={{ background: '' }}>
         <>
           {pods.map((pod, index) => (
-            <Card key={index} pod={pod} showPercentage={options.showPercentage} />
+            <Card
+              key={index}
+              pod={pod}
+              showPercentage={options.showPercentage}
+              cardSize={options.cardSize}
+              podNameSize={options.podNameSize}
+              usageTextSize={options.usageTextSize}
+              usageIconSize={options.usageIconSize}
+            />
           ))}
         </>
       </div>
@@ -168,9 +176,13 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
 interface CardProps {
   pod: Pod;
   showPercentage: boolean;
+  cardSize: number;
+  podNameSize: number;
+  usageTextSize: number;
+  usageIconSize: number;
 }
 
-const Card: React.FC<CardProps> = ({ pod, showPercentage }) => {
+const Card: React.FC<CardProps> = ({ pod, showPercentage, cardSize, podNameSize, usageTextSize, usageIconSize }) => {
   let memPerc = '' + pod.memoryPerc;
   let cpuPerc = '' + pod.cpuPerc;
 
@@ -181,24 +193,28 @@ const Card: React.FC<CardProps> = ({ pod, showPercentage }) => {
   if (pod.cpuUnknown) {
     cpuPerc = '??';
   }
-
+  console.log(usageIconSize);
   return (
     <div
-      className="p-2 m-2 rounded-lg w-20 h-20 hover:w-auto shadow-lg border-[{pod.textColor}] border"
+      className={`p-2 m-2 rounded-lg size-[${cardSize}px] hover:w-auto shadow-lg border-[${pod.textColor}] border`}
       style={{ background: pod.color, color: pod.textColor, fill: pod.textColor }}
     >
-      <div className="text-xs truncate">{pod.name}</div>
+      <div className={`text-[${podNameSize}px] truncate`}>{pod.name}</div>
       <div className="flex items-center">
-        <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+        <svg className={`size-[${usageIconSize}px]`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
           <path d="M176 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40c-35.3 0-64 28.7-64 64l-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0 0 56-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0 0 56-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0c0 35.3 28.7 64 64 64l0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40 56 0 0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40 56 0 0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40c35.3 0 64-28.7 64-64l40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0 0-56 40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0 0-56 40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0c0-35.3-28.7-64-64-64l0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40-56 0 0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40-56 0 0-40zM160 128l192 0c17.7 0 32 14.3 32 32l0 192c0 17.7-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32l0-192c0-17.7 14.3-32 32-32zm192 32l-192 0 0 192 192 0 0-192z" />
         </svg>
-        <div className="ml-2 truncate">{showPercentage ? `${cpuPerc}%` : `${pod.cpu}/${pod.cpuLimit}`}</div>
+        <div className={`text-[${usageTextSize}px] ml-2 truncate`}>
+          {showPercentage ? `${cpuPerc}%` : `${pod.cpu}/${pod.cpuRequest}`}
+        </div>
       </div>
       <div className="flex items-center">
-        <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+        <svg className={`size-[${usageIconSize}px]`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
           <path d="M64 64C28.7 64 0 92.7 0 128l0 7.4c0 6.8 4.4 12.6 10.1 16.3C23.3 160.3 32 175.1 32 192s-8.7 31.7-21.9 40.3C4.4 236 0 241.8 0 248.6L0 320l576 0 0-71.4c0-6.8-4.4-12.6-10.1-16.3C552.7 223.7 544 208.9 544 192s8.7-31.7 21.9-40.3c5.7-3.7 10.1-9.5 10.1-16.3l0-7.4c0-35.3-28.7-64-64-64L64 64zM576 352L0 352l0 64c0 17.7 14.3 32 32 32l48 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 96 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 96 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 96 0 0-32c0-8.8 7.2-16 16-16s16 7.2 16 16l0 32 48 0c17.7 0 32-14.3 32-32l0-64zM192 160l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32zm128 0l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32zm128 0l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32z" />
         </svg>
-        <div className="ml-2 truncate">{showPercentage ? `${memPerc}%` : `${pod.memory}/${pod.memoryLimit}`}</div>
+        <div className={`text-[${usageTextSize}px] ml-2 truncate`}>
+          {showPercentage ? `${memPerc}%` : `${pod.memory}/${pod.memoryLimit}`}
+        </div>
       </div>
     </div>
   );

@@ -9,6 +9,35 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Show Percentage',
       defaultValue: true,
     })
+    .addNumberInput({
+      path: 'cardSize',
+      name: 'Card size',
+      description: 'Card size in pixels',
+      defaultValue: 70,
+      category: ['Layout'],
+    })
+    .addNumberInput({
+      path: 'podNameSize',
+      name: 'Pod name size',
+      description: 'Pod name size in pixels',
+      defaultValue: 10,
+      category: ['Layout'],
+    })
+    .addNumberInput({
+      path: 'usageTextSize',
+      name: 'Usage text size',
+      description: 'Usage text size in pixels',
+      defaultValue: 12,
+      category: ['Layout'],
+    })
+    .addNumberInput({
+      path: 'usageIconSize',
+      name: 'Usage icon size',
+      description: 'Usage icon size in pixels',
+      defaultValue: 14,
+      category: ['Layout'],
+    })
+
     .addTextInput({
       path: 'podNameColumnName',
       name: 'Pod',
@@ -24,10 +53,10 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: ['Column names'],
     })
     .addTextInput({
-      path: 'cpuLimitColumnName',
-      name: 'CPU limit',
+      path: 'cpuRequestColumnName',
+      name: 'CPU request',
       description: 'The column name of the CPU limit in the result set',
-      defaultValue: 'cpu_limit',
+      defaultValue: 'cpu_request',
       category: ['Column names'],
     })
     .addTextInput({

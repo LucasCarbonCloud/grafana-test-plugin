@@ -1,7 +1,7 @@
 export interface SimpleOptions {
   podNameColumnName: string;
   cpuColumnName: string;
-  cpuLimitColumnName: string;
+  cpuRequestColumnName: string;
   memoryColumnName: string;
   memoryLimitColumnName: string;
   showPercentage: boolean;
@@ -16,4 +16,9 @@ export interface SimpleOptions {
   memoryLowLevel: number;
   cpuLowLevel: number;
   lowColor: string;
+
+  cardSize: number;
+  podNameSize: number;
+  usageTextSize: number;
+  usageIconSize: number;
 }
