@@ -20,12 +20,15 @@
   "graphTooltip": 0,
   "id": 1,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "datasource": {
-        "type": "grafana-testdata-datasource",
-        "uid": "trlxrdZVk"
+        "type": "grafana-clickhouse-datasource",
+        "uid": "aebj8noyvepkwe"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -35,19 +38,46 @@
       },
       "id": 1,
       "options": {
+        "cpuColumnName": "cpu",
+        "cpuErrorLevel": 90,
+        "cpuLimitColumnName": "cpu_limit",
+        "cpuWarningLevel": 75,
+        "errorColor": "red",
+        "memoryColumnName": "memory",
+        "memoryErrorLevel": 90,
+        "memoryLimitColumnName": "memory_limit",
+        "memoryWarningLevel": 75,
+        "okColor": "green",
+        "podNameColumnName": "pod",
         "seriesCountSize": "sm",
+        "showPercentage": true,
         "showSeriesCount": false,
-        "text": "Default value of text input option"
+        "text": "Default value of text input option",
+        "warningColor": "orange"
       },
+      "pluginVersion": "1.0.2",
       "targets": [
         {
           "datasource": {
-            "type": "grafana-testdata-datasource",
-            "uid": "db84e60d-b92a-4089-82cb-34842fb1754b"
+            "type": "grafana-clickhouse-datasource",
+            "uid": "aebj8noyvepkwe"
           },
-          "refId": "A",
-          "scenarioId": "raw_frame",
-          "rawFrameContent": "[\n  {\n    \"columns\": [\n      {\n        \"text\": \"Time\",\n        \"type\": \"time\"\n      },\n      {\n        \"text\": \"app\",\n        \"type\": \"string\"\n      },\n      {\n        \"text\": \"pod\",\n        \"type\": \"string\"\n      },\n      {\n        \"text\": \"memory\",\n        \"type\": \"number\"\n      },\n      {\n        \"text\": \"memory_limit\",\n        \"type\": \"number\"\n      },\n      {\n        \"text\": \"cpu\",\n        \"type\": \"number\"\n      },\n      {\n        \"text\": \"cpu_limit\",\n        \"type\": \"number\"\n      }\n    ],\n    \"rows\": [\n      [1609459200000, \"appA\", \"alertmanager-kube-prometheus-stack-alertmanager-0\", 10, 9, 1000, 1700],\n      [1609462800000, \"appB\", \"logs-collector-zdvg9\", 20, 22, 121, 234],\n      [1609466400000, \"appA\", \"ztunnel-7rnd7\", 15, 15, 123, 222],\n      [1609470000000, \"appC\", \"argocd-redis-ha-haproxy-7d9d56ffd8-bwx2t\", 25, 100, 2311, 45345],\n      [1609473600000, \"appA\", \"carbondata-backend-7955566874-6xfn4\", 30, 50, 23423, 123]\n    ]\n  }\n]\n"
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.6.0",
+          "queryType": "table",
+          "rawSql": "SELECT\n    pod,\n    max(memory) AS memory,\n    max(cpu) AS cpu,\n    max(memory_limit) AS memory_limit,\n    max(cpu_limit) AS cpu_limit\nFROM\n(\n    SELECT\n        ResourceAttributes['pod.name'] AS pod,\n        last_value(Value) AS memory,\n        NULL AS cpu,\n        NULL AS memory_limit,\n        NULL AS cpu_limit\n    FROM \"otel_metrics_gauge\"\n    WHERE (TimeUnix >= $__fromTime AND TimeUnix <= $__toTime)\n        AND (MetricName = 'container.memory.usage')\n    GROUP BY pod\n\n    UNION ALL\n\n    SELECT\n        ResourceAttributes['pod.name'] AS pod,\n        NULL AS memory,\n        last_value(Value) AS cpu,\n        NULL AS memory_limit,\n        NULL AS cpu_limit\n    FROM \"otel_metrics_gauge\"\n    WHERE (TimeUnix >= $__fromTime AND TimeUnix <= $__toTime)\n        AND (MetricName = 'container.cpu.usage')\n    GROUP BY pod\n\n    UNION ALL\n\n    SELECT\n        ResourceAttributes['pod.name'] AS pod,\n        NULL AS memory,\n        NULL AS cpu,\n        last_value(Value) AS memory_limit,\n        NULL AS cpu_limit\n    FROM \"otel_metrics_gauge\"\n    WHERE (TimeUnix >= $__fromTime AND TimeUnix <= $__toTime)\n        AND (MetricName = 'k8s.container.memory_limit')\n    GROUP BY pod\n\n    UNION ALL\n\n    SELECT\n        ResourceAttributes['pod.name'] AS pod,\n        NULL AS memory,\n        NULL AS cpu,\n        NULL AS memory_limit,\n        last_value(Value) AS cpu_limit\n    FROM \"otel_metrics_gauge\"\n    WHERE (TimeUnix >= $__fromTime AND TimeUnix <= $__toTime)\n        AND (MetricName = 'k8s.container.cpu_limit')\n    GROUP BY pod\n)\nGROUP BY pod\nORDER BY pod\nLIMIT 1000;\n",
+          "refId": "A"
         }
       ],
       "title": "Sample Panel Title",
@@ -58,6 +88,10 @@
         "type": "grafana-testdata-datasource",
         "uid": "trlxrdZVk"
       },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -66,10 +100,24 @@
       },
       "id": 2,
       "options": {
+        "cpuColumnName": "cpu",
+        "cpuErrorLevel": 90,
+        "cpuLimitColumnName": "cpu_limit",
+        "cpuWarningLevel": 75,
+        "errorColor": "red",
+        "memoryColumnName": "memory",
+        "memoryErrorLevel": 90,
+        "memoryLimitColumnName": "memory_limit",
+        "memoryWarningLevel": 75,
+        "okColor": "green",
+        "podNameColumnName": "pod",
         "seriesCountSize": "sm",
+        "showPercentage": true,
         "showSeriesCount": false,
-        "text": "Default value of text input option"
+        "text": "Default value of text input option",
+        "warningColor": "orange"
       },
+      "pluginVersion": "1.0.2",
       "targets": [
         {
           "alias": "",
@@ -85,8 +133,9 @@
       "type": "test-grafanatest-panel"
     }
   ],
+  "preload": false,
   "refresh": "",
-  "schemaVersion": 39,
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": []

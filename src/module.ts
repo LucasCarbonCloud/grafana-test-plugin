@@ -86,11 +86,39 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: 'orange',
       category: ['Levels'],
     })
+    .addNumberInput({
+      path: 'cpuLowLevel',
+      name: 'CPU low utilization level',
+      description: 'Level in percent when utilization is too low',
+      defaultValue: 30,
+      category: ['Levels'],
+    })
+    .addNumberInput({
+      path: 'memoryLowLevel',
+      name: 'Memory low utilization level',
+      description: 'Level in percent when utilization is too low',
+      defaultValue: 30,
+      category: ['Levels'],
+    })
+    .addColorPicker({
+      path: 'lowColor',
+      name: 'Low Utilization color',
+      description: 'color when utilization is too low',
+      defaultValue: 'semi-dark-purple',
+      category: ['Levels'],
+    })
     .addColorPicker({
       path: 'okColor',
       name: 'OK color',
       description: 'color when ok state',
       defaultValue: 'green',
+      category: ['Levels'],
+    })
+    .addColorPicker({
+      path: 'unknownColor',
+      name: 'Unknown status color',
+      description: 'color when unknown state',
+      defaultValue: '#373737',
       category: ['Levels'],
     });
 });

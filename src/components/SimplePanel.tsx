@@ -39,6 +39,8 @@ interface Pod {
   state: string;
   color: string;
   textColor: string;
+  memoryUnknown: boolean;
+  cpuUnknown: boolean;
 }
 
 function colorIsDark(bgColor: string): boolean {
@@ -88,24 +90,39 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
       state: 'none',
       color: '#000000',
       textColor: '#FFFFFF',
+      memoryUnknown: false,
+      cpuUnknown: false,
     };
 
-    if ('' + pod.memoryLimit === '' || pod.memoryLimit === undefined) {
-      pod.memoryLimit = -1;
-      pod.memoryPerc = -1;
+    if (!pod.memoryLimit) {
+      pod.memoryUnknown = true;
     }
 
-    if ('' + pod.cpuLimit === '' || pod.cpuLimit === undefined) {
-      pod.cpuLimit = -1;
-      pod.cpuPerc = -1;
+    if (!pod.cpuLimit) {
+      pod.cpuUnknown = true;
     }
 
-    if (pod.memoryPerc >= options.memoryErrorLevel || pod.cpuPerc >= options.cpuErrorLevel) {
+    if (pod.memoryUnknown && pod.cpuUnknown) {
+      pod.state = 'unknown';
+      pod.color = theme.visualization.getColorByName(options.unknownColor);
+    } else if (
+      (!pod.memoryUnknown && pod.memoryPerc >= options.memoryErrorLevel) ||
+      (!pod.cpuUnknown && pod.cpuPerc >= options.cpuErrorLevel)
+    ) {
       pod.state = 'error';
       pod.color = theme.visualization.getColorByName(options.errorColor);
-    } else if (pod.memoryPerc >= options.memoryWarningLevel || pod.cpuPerc >= options.cpuWarningLevel) {
+    } else if (
+      (!pod.memoryUnknown && pod.memoryPerc >= options.memoryWarningLevel) ||
+      (!pod.cpuUnknown && pod.cpuPerc >= options.cpuWarningLevel)
+    ) {
       pod.state = 'warn';
       pod.color = theme.visualization.getColorByName(options.warningColor);
+    } else if (
+      (!pod.memoryUnknown && pod.memoryPerc <= options.memoryLowLevel) ||
+      (!pod.cpuUnknown && pod.cpuPerc <= options.cpuLowLevel)
+    ) {
+      pod.state = 'low';
+      pod.color = theme.visualization.getColorByName(options.lowColor);
     } else {
       pod.state = 'ok';
       pod.color = theme.visualization.getColorByName(options.okColor);
@@ -120,15 +137,22 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, fie
     return pod;
   });
 
+  const stateOrder = ['error', 'warn', 'low', 'ok', 'unknown'];
+  pods.sort((a, b) => stateOrder.indexOf(a.state) - stateOrder.indexOf(b.state));
+
   return (
     <div
-      className={cx(
-        styles.wrapper,
-        css`
-          width: ${width}px;
-          height: ${height}px;
-        `
-      )}
+      className={
+        'overflow-y-scroll' +
+        ' ' +
+        cx(
+          styles.wrapper,
+          css`
+            width: ${width}px;
+            height: ${height}px;
+          `
+        )
+      }
     >
       <div className="flex flex-wrap" style={{ background: '' }}>
         <>
@@ -150,17 +174,17 @@ const Card: React.FC<CardProps> = ({ pod, showPercentage }) => {
   let memPerc = '' + pod.memoryPerc;
   let cpuPerc = '' + pod.cpuPerc;
 
-  if (pod.memoryPerc === -1) {
+  if (pod.memoryUnknown) {
     memPerc = '??';
   }
 
-  if (pod.cpuPerc === -1) {
+  if (pod.cpuUnknown) {
     cpuPerc = '??';
   }
 
   return (
     <div
-      className="p-2 m-2 rounded-lg w-20 h-20"
+      className="p-2 m-2 rounded-lg w-20 h-20 hover:w-auto shadow-lg border-[{pod.textColor}] border"
       style={{ background: pod.color, color: pod.textColor, fill: pod.textColor }}
     >
       <div className="text-xs truncate">{pod.name}</div>

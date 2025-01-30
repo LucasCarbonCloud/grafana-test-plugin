@@ -12,4 +12,8 @@ export interface SimpleOptions {
   okColor: string;
   warningColor: string;
   errorColor: string;
+  unknownColor: string;
+  memoryLowLevel: number;
+  cpuLowLevel: number;
+  lowColor: string;
 }
